@@ -59,14 +59,10 @@ int longestSequenceMagicVowels(string s) {
                         currentSequence = 0;
                     break;
                 case 'o':
-                    if (currentSequence > 0) {
-                        if (currentChar == 'o')
-                            currentSequence++;
-                        else if (currentChar == 'u') { // Step 'up' to u
-                            currentSequence++;
-                        } else
-                            currentSequence = 0;
-                    }
+                    if (currentChar == 'o' || currentChar == 'u')
+                        currentSequence++;
+                    else
+                        currentSequence = 0;
                     break;
             }
         } else {
