@@ -7,6 +7,6 @@
 
 // Function Prototype
 void makeChange(int, int, int[], int);
-int main();
+int makeChange_driver();
 
 #endif //NATIVECPLUSPLUSWRAPPER_BESTCOINS_H

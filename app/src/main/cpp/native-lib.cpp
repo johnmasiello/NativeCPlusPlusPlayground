@@ -3,6 +3,7 @@
 #include <iostream>
 #include "bestCoins.h"
 #include "util.h"
+#include "magic-vowels.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, jobject instance) {
     COUT("Hello World from Jni!");
-    main();
+    makeChange_driver();
 
     /*
      * Here are the valid coin values, in cents:
@@ -31,5 +32,15 @@ Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, job
     Number of possible combinations: 93
     Best combination of coins:
     50 10 5 1 1
+     */
+
+    COUT("\n \n ");
+    magicVowels_driver();
+
+    /*
+     * A very long string:
+    zzdsfasdegsagweagaeiouuuuoiuiououaaasdbadaaaaeeeeeeeeiiiiiooozzzzzaaaaaeeeeeeeeeeeeeiiiiiiiiooooooouuuuuuuuuuuuuuuuuuuuu
+    length of the longest sequence with repeats and in-order of 'aeiou':
+    54
      */
 }

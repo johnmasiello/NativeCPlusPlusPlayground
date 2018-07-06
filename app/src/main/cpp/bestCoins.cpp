@@ -27,7 +27,7 @@ int numBestCoins = NO_SOLUTION,     // Number of coins in bestCoins
         numSolutions = 0,           // Number of ways to make change
         numCoins;                   // Number of allowable coins
 
-int main() {
+int makeChange_driver() {
     int coinsUsed[MAX_COINS_CHANGE],    // List of coins used
         numCoinsUsed = 0,               // The number of coins used
         amount;                         // The amount to make change for
