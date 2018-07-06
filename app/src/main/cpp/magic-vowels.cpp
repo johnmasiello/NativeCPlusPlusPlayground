@@ -65,20 +65,8 @@ int longestSequenceMagicVowels(string s) {
                         currentSequence = 0;
                     break;
             }
-        } else {
-            switch (prevChar) {
-                case 'a':
-                case 'e':
-                case 'i':
-                case 'o':
-                case 'u':
-                    break;
-
-                default:
-                    if (currentChar == 'a')
-                        currentSequence = 1; // The start of the magic sequence
-            }
-        }
+        } else if (currentChar == 'a')
+            currentSequence = 1; // The start of the magic sequence
 
         // Update
         prevChar = currentChar;
