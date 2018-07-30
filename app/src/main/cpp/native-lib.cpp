@@ -4,6 +4,7 @@
 #include "bestCoins.h"
 #include "util.h"
 #include "magic-vowels.h"
+#include "bookBundles.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, jobject instance) {
     COUT("Hello World from Jni!");
-    makeChange_driver();
+//    makeChange_driver();
 
     /*
      * Here are the valid coin values, in cents:
@@ -35,12 +36,29 @@ Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, job
      */
 
     COUT("\n \n ");
-    magicVowels_driver();
+//    magicVowels_driver();
 
     /*
      * A very long string:
     zzdsfasdegsagweagaeiouuuuoiuiououaaasdbadaaaaeeeeeeeeiiiiiooozzzzzaaaaaeeeeeeeeeeeeeiiiiiiiiooooooouuuuuuuuuuuuuuuuuuuuu
     length of the longest sequence with repeats and in-order of 'aeiou':
     54
+     */
+
+    COUT("\n \n ");
+    bookBundles_driver();
+
+
+    /*
+     * Remaining Budget = $100
+        4.000000
+        3.916667
+        2.538462
+        2.285714
+        3.666667
+        4.333333
+        3.090909
+        Remaining Budget = $1
+        429
      */
 }

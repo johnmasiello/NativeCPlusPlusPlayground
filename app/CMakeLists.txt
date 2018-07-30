@@ -21,6 +21,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/bestCoins.cpp
              src/main/cpp/util.cpp
              src/main/cpp/magic-vowels.cpp
+             src/main/cpp/bookBundles.cpp
              )
 
 # Searches for a specified prebuilt library and stores the path as a
