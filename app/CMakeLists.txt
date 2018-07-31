@@ -22,6 +22,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/util.cpp
              src/main/cpp/magic-vowels.cpp
              src/main/cpp/bookBundles.cpp
+             src/main/cpp/leonardoPrimeFactors.cpp
              )
 
 # Searches for a specified prebuilt library and stores the path as a

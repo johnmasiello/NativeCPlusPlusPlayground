@@ -5,6 +5,7 @@
 #include "util.h"
 #include "magic-vowels.h"
 #include "bookBundles.h"
+#include "leonardoPrimeFactors.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, job
      */
 
     COUT("\n \n ");
-    bookBundles_driver();
+//    bookBundles_driver();
 
 
     /*
@@ -61,4 +62,7 @@ Java_com_example_john_nativecpluspluswrapper_NativeWrapper_main(JNIEnv *env, job
         Remaining Budget = $1
         429
      */
+
+    COUT("\n \n ");
+    prime_driver();
 }
