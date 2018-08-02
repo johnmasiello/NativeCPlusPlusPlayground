@@ -25,6 +25,7 @@ add_library( # Sets the name of the library.
              src/main/cpp/leonardoPrimeFactors.cpp
              src/main/cpp/sherlock-tiles.cpp
              src/main/cpp/extraLongFactorial.cpp
+             src/main/cpp/hacker-rank.cpp
              )
 
 # Searches for a specified prebuilt library and stores the path as a
