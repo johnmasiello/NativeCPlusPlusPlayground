@@ -1,4 +1,3 @@
-//
 // Created by john on 8/1/18.
 //
 #include "hacker-rank.h"
@@ -34,7 +33,7 @@ namespace sample_hacker_two {
     }
 }
 
-namespace hacker_one {
+namespace hacker_one { // Change problem -should spend some time studying similar problems
 // Complete the getUmbrellas function below.
     int getUmbrellas(int n, vector<int> p) {
 
@@ -42,7 +41,7 @@ namespace hacker_one {
     }
 }
 
-namespace hacker_two {
+namespace hacker_two { // Greedy algorithm
 
     struct myInt {
         int val;
@@ -170,7 +169,7 @@ namespace hacker_two {
     }
 }
 
-namespace hacker_three {
+namespace hacker_three { // Array Problem, sorting optional
     bool binContains(int l, int r, vector<int> &consumed, int &value) {
         if (l > r)
             return false;
@@ -261,7 +260,7 @@ namespace hacker_three {
     }
 }
 
-namespace hacker_four {
+namespace hacker_four { // Stack problem
 
 
     bool matchingBrace(char left, char right) {
@@ -311,21 +310,37 @@ namespace hacker_four {
     }
 
     void test() {
+        vector<string> input = {
+                "[{()}]",
+                "{}[]()",
+                "{[}]}"
+        };
 
-        vector<string> input(0);
+        COUT("Matching Braces");
+        output_std(input);
+        output_std(braces(input));
+    }
+}
 
-        input.push_back("[{()}]");
-        input.push_back("{}[]()");
-        input.push_back("{[}]}");
+namespace grading_students {
+/*
+ * Complete the gradingStudents function below.
+ */
+    vector<int> gradingStudents(vector<int> grades) {
+        vector<int> rounded(grades.size());
+        // Perform rounding
+        for (int i = 0; i < grades.size(); i++)
+            rounded[i] = grades[i] < 38 || grades[i] % 5 < 3 ? grades[i] :
+                             grades[i] + 5 - (grades[i] % 5);
 
-        for (int i = 0; i < input.size(); i++)
-            COUT(input[i].data());
+        return rounded;
+    }
 
-        // Process the parenthesis to annotate them as balanced: "YES" | "NO"
-        vector<string> balanced = hacker_four::braces(input);
-
-        for (vector<string>::iterator it = balanced.begin(); it < balanced.end(); it++)
-            COUT(it->data());
+    void test() {
+        vector<int> grades = {22, 33, 56, 45, 38, 37, 64, 52, 85, 76, 77, 88, 90, 94, 100};
+        COUT("Grading Students");
+        output_std(grades);
+        output_std(gradingStudents(grades));
     }
 }
 
@@ -341,13 +356,12 @@ namespace hacker_four {
  */
 
 int main() {
-//    COUT(to_string(sample_hacker_one::main()).data());
-//    COUT(to_string(sample_hacker_two::main()).data());
 //    hacker_two::test();
 //    hacker_three::test();
-    hacker_four::test();
-//
-    const char allDone[] = "Complete";
-    COUT(allDone);
+//    hacker_four::test();
+    grading_students::test();
+
+
+    COUT("Complete");
     return 0;
 }
