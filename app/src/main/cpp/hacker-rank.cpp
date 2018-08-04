@@ -5,6 +5,7 @@
 #include "util.h"
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -170,28 +171,94 @@ namespace hacker_two {
 }
 
 namespace hacker_three {
+    bool binContains(int l, int r, vector<int> &consumed, int &value) {
+        if (l > r)
+            return false;
+
+        int m = (l + r) >> 1;
+
+        if (consumed[m] == value)
+            return true;
+
+        if (value < consumed[m])
+            return binContains(l, --m, consumed, value);
+
+        return binContains(++m, r, consumed, value);
+    }
+
+    void consume(vector<int> &consumed, int &value) {
+        for (vector<int>::iterator it = consumed.begin(); it < consumed.end(); it++) {
+            if (value < *it) {
+                consumed.insert(it, value);
+                return;
+            }
+        }
+        consumed.push_back(value);
+    }
+
 // Complete the numberOfPairs function below.
     int numberOfPairs(vector<int> a, long k) {
 
+        // Keep the pairs distinct, by searching for x in (x, y) | x <= y
+        const long midValueGuard = (k >> 1) + 1;
+
+        // A sorted container
+        vector<int> consumed(0);
+
+        int complement, num_distinct_pairs = 0;
+
+        for (vector<int>::iterator it = a.begin(); it < a.end(); it++) {
+            if (*it < midValueGuard && !binContains(0, (int)consumed.size() - 1, consumed, *it)) {
+                // Form the complementary element that makes the pair sum to k
+                complement = static_cast<int>(k) - *it;
+
+                // Search for the term
+                for (vector<int>::iterator it2 = a.begin(); it2 < a.end(); it2++) {
+                    if (it2 != it && *it2 == complement) {
+                        num_distinct_pairs++;
+
+                        // Consume the first term in the pair
+                        consume(consumed, *it);
+                        break;
+                    }
+                }
+            }
+        }
+        return num_distinct_pairs;
     }
 
+    void test() {
+        const int k = 12;
 
+        vector<int> a(0);
+        const int vals[] = {
+                1, 2, 3, 4,
+                5, 6, 6, 9,
+                10, 11
+        };
+        const int size = 10;
 
+        const char terms[] = "Elements: \n";
+        COUT(terms);
+        string listTerms = "";
 
+        for (int i = 0; i < size; i++) {
+            a.push_back(vals[i]);
+            listTerms += to_string(vals[i]) + ' ';
+        }
+        listTerms += '\n';
+        COUT(listTerms.data());
+        listTerms = "Number of pairs that sum to " + to_string(k) + "...";
+        COUT(listTerms.data());
+        COUT(to_string(numberOfPairs(a, k)).data());
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        /**
+         * Elements:
+            1 2 3 4 5 6 6 9 10 11
+            Number of pairs that sum to 12...
+            4
+         */
+    }
 }
 
 namespace hacker_four {
@@ -232,7 +299,8 @@ namespace hacker_four {
 int main() {
 //    COUT(to_string(sample_hacker_one::main()).data());
 //    COUT(to_string(sample_hacker_two::main()).data());
-    hacker_two::test();
+//    hacker_two::test();
+    hacker_three::test();
 
     return 0;
 }
