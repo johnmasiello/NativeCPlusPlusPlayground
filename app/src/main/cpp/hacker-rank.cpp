@@ -262,27 +262,71 @@ namespace hacker_three {
 }
 
 namespace hacker_four {
-// Complete the braces function below.
-    vector<string> braces(vector<string> values) {
 
 
+    bool matchingBrace(char left, char right) {
+        if (left == '(' && right == ')')
+            return true;
+        if (left == '[' && right == ']')
+            return true;
+        if (left == '{' && right == '}')
+            return true;
+        return false;
     }
 
+    bool balanced(string s) {
+        vector<char> leftBraces(0);
+        bool prevWasRightBrace = false;
 
+        for (int i = 0; i < s.size(); i++) {
+            if ( (s[i] == '(') || (s[i] == '{') || (s[i] == '[') ) {
+                // The previous brace was a right brace, so all left braces should be consumed
+                if (prevWasRightBrace && !leftBraces.empty())
+                    return false;
 
+                leftBraces.push_back(s[i]);
+                prevWasRightBrace = false;
+            }
+            else if ( (s[i] == ')') || (s[i] == '}') || (s[i] == ']') ) {
+                if (leftBraces.empty() || !matchingBrace(leftBraces.back(), s[i]))
+                    return false;
 
+                leftBraces.pop_back();
+                prevWasRightBrace = true;
+            }
+        }
 
+        // End of string; there should be no more left braces
+        return leftBraces.empty();
+    }
 
+// Complete the braces function below.
+    vector<string> braces(vector<string> values) {
+        vector<string> _balanced(values.size());
 
+        for (int i = 0; i < values.size(); i++)
+            _balanced[i] = balanced(values[i]) ? "YES" : "NO";
 
+        return _balanced;
+    }
 
+    void test() {
 
+        vector<string> input(0);
 
+        input.push_back("[{()}]");
+        input.push_back("{}[]()");
+        input.push_back("{[}]}");
 
+        for (int i = 0; i < input.size(); i++)
+            COUT(input[i].data());
 
+        // Process the parenthesis to annotate them as balanced: "YES" | "NO"
+        vector<string> balanced = hacker_four::braces(input);
 
-
-
+        for (vector<string>::iterator it = balanced.begin(); it < balanced.end(); it++)
+            COUT(it->data());
+    }
 }
 
 /* The main driver
@@ -300,7 +344,10 @@ int main() {
 //    COUT(to_string(sample_hacker_one::main()).data());
 //    COUT(to_string(sample_hacker_two::main()).data());
 //    hacker_two::test();
-    hacker_three::test();
-
+//    hacker_three::test();
+    hacker_four::test();
+//
+    const char allDone[] = "Complete";
+    COUT(allDone);
     return 0;
 }
