@@ -601,6 +601,64 @@ namespace maximumPerimeterTriangle {
     }
 }
 
+namespace largestPermutation {
+    // Complete the largestPermutation function below.
+    vector<int> largestPermutation(int k, vector<int> arr) {
+        int mostSignificantSwapPosition = 0;
+        int searchValue;
+
+        while (k-- > 0 && mostSignificantSwapPosition < arr.size()) {
+            searchValue = arr.size() - mostSignificantSwapPosition;
+            for (int i = mostSignificantSwapPosition; i < arr.size(); i++) {
+                if (arr[i] == searchValue) {
+                    if (i == mostSignificantSwapPosition) { // No swap necessary
+                        mostSignificantSwapPosition++;
+                        searchValue = arr.size() - mostSignificantSwapPosition;
+                    } else {
+                        arr[i] = arr[mostSignificantSwapPosition];
+                        arr[mostSignificantSwapPosition++] = searchValue;
+                        break; // Consume a swap; fallback to the outermost loop
+                    }
+                }
+            }
+        }
+        return arr;
+    }
+
+    void test() {
+        vector<int> arr = {
+//                5, 4, 3, 2, 1
+                1, 2, 3, 4, 5
+        };
+        COUT("Largest Permutation");
+        COUT("Starting Array");
+        output_std(arr);
+
+        const int swaps = 1;
+        COUT(("Most \'backwards\' array using "+to_string(swaps)+" swap(s)...").data());
+        vector<int> result = largestPermutation(swaps, arr);
+        output_std(result);
+
+        /*
+         * Largest Permutation
+            Starting Array
+            5 4 3 2 1
+            Most 'backwards' array using 1 swap(s)...
+            5 4 3 2 1
+            Complete
+         */
+
+        /*
+         *Largest Permutation
+            Starting Array
+            1 2 3 4 5
+            Most 'backwards' array using 1 swap(s)...
+            5 2 3 4 1
+            Complete
+         */
+    }
+}
+
 /* The main driver
  *
  *
@@ -621,7 +679,8 @@ int main() {
 //    grid_challenge::test();
 //    marcsCakewalk::test();
 //    luck_balance::test();
-    maximumPerimeterTriangle::test();
+//    maximumPerimeterTriangle::test();
+    largestPermutation::test();
 
     COUT("Complete");
     return 0;
