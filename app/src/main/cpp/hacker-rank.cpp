@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -318,7 +319,9 @@ namespace hacker_four { // Stack problem
 
         COUT("Matching Braces");
         output_std(input);
-        output_std(braces(input));
+
+        vector<string> result = braces(input);
+        output_std(result);
     }
 }
 
@@ -340,7 +343,152 @@ namespace grading_students {
         vector<int> grades = {22, 33, 56, 45, 38, 37, 64, 52, 85, 76, 77, 88, 90, 94, 100};
         COUT("Grading Students");
         output_std(grades);
-        output_std(gradingStudents(grades));
+
+        vector<int> result = gradingStudents(grades);
+        output_std(result);
+    }
+}
+
+namespace min_absolute_distance_array {
+    // Complete the minimumAbsoluteDifference function below.
+    // I got time-out errors in the test environment
+    int minimumAbsoluteDifference(vector<int> arr) {
+        int mindiff, absoluteMinDiff = numeric_limits<int>::max();
+
+        for (int i = 0; i < arr.size(); ++i) {
+            for (int j = i + 1; j < arr.size(); ++j) {
+                if ((mindiff = abs(arr[i] - arr[j])) < absoluteMinDiff) {
+                    if (mindiff == 0)
+                        return mindiff;
+                    else
+                        absoluteMinDiff = mindiff;
+
+                    // Debug
+//                    COUT(("("+to_string(arr[i])+","+to_string(arr[j])+")").data());
+                }
+            }
+        }
+        return absoluteMinDiff;
+    }
+
+    int minimumAbsoluteDifference_1_1(vector<int> arr) {
+        // Reduce the number of comparisons by first performing a sort
+        // We need only compare adjacent elements
+//        sort(arr.begin(), arr.end());
+        my_quickSort(arr);
+
+        int mindiff, absoluteMinDiff = numeric_limits<int>::max();
+        const int comparisons = arr.size() - 1;
+
+        int i = -1;
+
+        while (++i < comparisons) {
+            if ((mindiff = arr[i + 1] - arr[i]) < absoluteMinDiff) {
+                if (mindiff == 0)
+                    return mindiff;
+                else
+                    absoluteMinDiff = mindiff;
+
+                // Debug
+//                    COUT(("("+to_string(arr[i])+","+to_string(arr[j])+")").data());
+            }
+
+        }
+        return absoluteMinDiff;
+    }
+
+    void test() {
+        vector<int> nums = {
+//                22, 33, 56, 45, 38, 37, 64, 52, 85, 76, 77, 88, 90, 94, 100
+                -59, -36, -13, 1, -53, -92, -2, -96, -54, 75
+        };
+        COUT("Minimum Absolute Distance within Array");
+        output_std(nums);
+
+        COUT(to_string(minimumAbsoluteDifference_1_1(nums)).data());
+    }
+}
+
+namespace grid_challenge {
+    // Complete the gridChallenge function below.
+    string gridChallenge(vector<string> &grid) {
+        sort(grid[0].begin(), grid[0].end());
+
+        for (int i = 1; i < grid.size(); i++) {
+            // Sort the rows
+            sort(grid[i].begin(), grid[i].end());
+
+            for (int j = 0; j < grid.size(); j++) {
+                // Columns must be monotonically increasing
+                if (grid[i -1][j] > grid[i][j])
+                    return "NO";
+            }
+        }
+        return "YES";
+    }
+
+    void test() {
+        vector<string> grid = {
+                "abdefg",
+                "begfad",
+                "bagfed",
+                "dbagfe",
+                "fbdaeg",
+                "beagdf"
+        };
+
+        COUT("Grid Challenge");
+        output_std(grid);
+
+        string result = gridChallenge(grid);
+        COUT("Sorting the grid by rows...");
+        output_std(grid);
+        COUT("Columns are also sorted...");
+        COUT(result.data());
+    }
+}
+
+namespace marcsCakewalk {
+    // Complete the marcsCakewalk function below.
+    long marcsCakewalk(vector<int> calorie) {
+        struct cmp {
+            bool operator()(const int &a, const int &b) {
+                return a > b;
+            }
+        };
+
+        // We need calories in descending order to solve the problem
+//        sort(calorie.begin(), calorie.end(), greater<int>()); // or equivalently
+        sort(calorie.begin(), calorie.end(), cmp {});
+
+        long miles = 0;
+        long power = 1;
+
+        for (int c : calorie) {
+            miles += power * c;
+            power = power << 1;
+        }
+        return miles;
+    }
+
+    void test() {
+        vector<int> calories = {
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                14,
+                22,
+                36,
+                44,
+                88
+        };
+        output_std(calories);
+        COUT("Minimum number of miles for Marc to walk...");
+        COUT(to_string(marcsCakewalk(calories)).data());
     }
 }
 
@@ -359,8 +507,10 @@ int main() {
 //    hacker_two::test();
 //    hacker_three::test();
 //    hacker_four::test();
-    grading_students::test();
-
+//    grading_students::test();
+//    min_absolute_distance_array::test();
+//    grid_challenge::test();
+    marcsCakewalk::test();
 
     COUT("Complete");
     return 0;
