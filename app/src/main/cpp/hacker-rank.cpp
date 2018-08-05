@@ -560,6 +560,47 @@ namespace luck_balance {
     }
 }
 
+namespace maximumPerimeterTriangle {
+    // Complete the maximumPerimeterTriangle function below.
+    vector<int> maximumPerimeterTriangle(vector<int> sticks) {
+        sort(sticks.begin(), sticks.end());
+        for (int i = sticks.size() - 1; i > 1; i--) {
+            if (sticks[i] < sticks[i - 1] + sticks[i - 2])
+                return {sticks[i - 2], sticks[i - 1], sticks[i]};
+        }
+        return {-1}; // No triangles found
+    }
+
+    void test() {
+        vector<int> sticks = {
+//                1, 2, 3
+                1, 1, 1, 2, 3, 5
+        };
+
+        COUT("Maximum Perimeter Triangle");
+        output_std(sticks);
+        COUT("Answer");
+        vector<int> result = maximumPerimeterTriangle(sticks);
+        output_std(result);
+
+        /*
+         * Maximum Perimeter Triangle
+            1 2 3
+            Answer
+            -1
+            Complete
+         */
+
+        /*
+         * Maximum Perimeter Triangle
+            1 1 1 2 3 5
+            Answer
+            1 1 1
+            Complete
+         */
+    }
+}
+
 /* The main driver
  *
  *
@@ -579,7 +620,8 @@ int main() {
 //    min_absolute_distance_array::test();
 //    grid_challenge::test();
 //    marcsCakewalk::test();
-    luck_balance::test();
+//    luck_balance::test();
+    maximumPerimeterTriangle::test();
 
     COUT("Complete");
     return 0;
