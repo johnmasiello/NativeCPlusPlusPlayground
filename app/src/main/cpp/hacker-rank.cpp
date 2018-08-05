@@ -1,5 +1,6 @@
+/*
 // Created by john on 8/1/18.
-//
+*/
 #include "hacker-rank.h"
 #include "util.h"
 #include <string>
@@ -492,6 +493,73 @@ namespace marcsCakewalk {
     }
 }
 
+namespace luck_balance {
+    // Complete the luckBalance function below.
+    int luckBalance(int k, vector<vector<int>> contests) {
+        struct cmp {
+            bool operator()(const vector<int> &a, const vector<int> &b) {
+                // First sort key = importance: Ti
+                // Second sort key = luck value: Li
+                return a[1] < b[1] || (a[1] == b[1] && a[0] < b[0]);
+            }
+        };
+        sort(contests.begin(), contests.end(), cmp {});
+        int luck = 0;
+
+        for (vector<int> dummy: contests) {
+            if (dummy[1])
+                break; // Reached the first element of the sorted as 'important' part of contests
+
+            luck += dummy[0];
+        }
+        int dummy = contests.size();
+        while (dummy-- > 0 && contests[dummy][1]) {
+            if (k > 0) {
+                luck += contests[dummy][0];
+                k--;
+            } else {
+                luck -= contests[dummy][0];
+            }
+        }
+
+        return luck;
+    }
+
+    void test() {
+        vector<vector<int>> contests = {
+                {4, 1},
+                {2, 1},
+                {5, 0},
+                {22, 1}
+
+//                {5, 1},
+//                {2, 1},
+//                {1, 1},
+//                {8, 1},
+//                {10, 0},
+//                {5, 0}
+        };
+        const int k = 2;
+
+        COUT("Luck Balance");
+        for (vector<int> x : contests)
+            output_std(x);
+        COUT(("Important losses allowed = "+to_string(k)).data());
+        COUT(("Total luck = "+to_string(luckBalance(k, contests))).data());
+
+        /*
+         * Luck Balance
+            4 1
+            2 1
+            5 0
+            22 1
+            Important losses allowed = 2
+            Total luck = 29
+            Complete
+         */
+    }
+}
+
 /* The main driver
  *
  *
@@ -510,7 +578,8 @@ int main() {
 //    grading_students::test();
 //    min_absolute_distance_array::test();
 //    grid_challenge::test();
-    marcsCakewalk::test();
+//    marcsCakewalk::test();
+    luck_balance::test();
 
     COUT("Complete");
     return 0;
