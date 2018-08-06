@@ -659,6 +659,65 @@ namespace largestPermutation {
     }
 }
 
+namespace greedy_florist {
+    // Complete the getMinimumCost function below.
+    // precondition: k > 0
+    int getMinimumCost(int k, vector<int> c) {
+        sort(c.begin(), c.end());
+
+        // kfold is the number of flowers purchased by each of the friends, within the k-fold
+        int kfold = 0, index;
+        int cost = 0;
+
+        do {
+            index = c.size() - k * kfold;
+            for (int i = 0; i < k; i++) {
+                if (index-- > 0)
+                    cost += (kfold + 1) * c[index];
+                else
+                    goto stop;
+            }
+            kfold++;
+
+        } while (true);
+        stop:
+        return cost;
+    }
+
+    void test() {
+        vector<int> costPerFlower = {
+                1, 4, 4, 7, 7, 8, 9, 9, 11
+//                1, 3, 5, 7, 9
+        };
+
+        const int kFriends = 3;
+
+        COUT("Greedy Florist");
+        output_std(costPerFlower);
+        COUT(("Number of friends to buy all of the flowers = "+to_string(kFriends)).data());
+        COUT("Minimum cost");
+        COUT(to_string(getMinimumCost(kFriends, costPerFlower)).data());
+
+        /*
+         *Greedy Florist
+            1 4 4 7 7 8 9 9 11
+            Number of friends to buy all of the flowers = 3
+            Minimum cost
+            100
+            Complete
+         */
+
+        /*
+         * Greedy Florist
+            1 3 5 7 9
+            Number of friends to buy all of the flowers = 3
+            Minimum cost
+            29
+            Complete
+         */
+    }
+}
+
 /* The main driver
  *
  *
@@ -680,7 +739,8 @@ int main() {
 //    marcsCakewalk::test();
 //    luck_balance::test();
 //    maximumPerimeterTriangle::test();
-    largestPermutation::test();
+//    largestPermutation::test();
+    greedy_florist::test();
 
     COUT("Complete");
     return 0;
