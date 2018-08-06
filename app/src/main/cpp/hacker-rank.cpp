@@ -718,6 +718,98 @@ namespace greedy_florist {
     }
 }
 
+namespace beautiful_pairs {
+    // Complete the beautifulPairs function below.
+    int beautifulPairs(vector<int> A, vector<int> B) {
+        vector<vector<int>> pairs(0);
+        vector<vector<int>>::reverse_iterator rit;
+        int n = A.size();
+        int bDummy;
+
+        for (int i = 0; i < n; ++i) {
+            bDummy = 0;
+
+            // Search for if the value of A[i] is already indicated by a beautiful pair.
+            // If affirmative, we want an index to start from j in B so that is B[j] == A[i],
+            // then j will be greater than any r in our beautiful pairs (l, r), and thus form
+            // a new distinct beautiful pair
+            for (rit = pairs.rbegin(); rit != pairs.rend(); rit++) {
+                if (A[i] == A[(*rit)[0]]) {
+                    bDummy = (*rit)[1] + 1;
+                    break;
+                }
+            }
+
+            // Search for the Bj term, such that B[j] == A[i]. Then (i, j) will be our new
+            // distinct beautiful pair
+            for (int j = bDummy; j < n; ++j) {
+                if (A[i] == B[j]) {
+                    pairs.push_back({i, j});
+                    break;
+                }
+            }
+        }
+
+        // Debug
+        for (auto pair : pairs) {
+            output_std(pair);
+            COUT("\n");
+        }
+
+        int distinctPairsBAsIs = pairs.size();
+
+        if (distinctPairsBAsIs == n) {
+            // You must replace EXACTLY one element, which will force a loss of a distinct beautiful pair
+            // when there are n of them
+            distinctPairsBAsIs--;
+            goto allDone;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////
+        // $$
+        // Search for an element (in A) to replace in B to maximize disjoint beautiful pairs
+        // $$
+        /////////////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < n; i++) {
+            // i is a distinct l-value, not in any of our already-constructed beautiful pairs (li, ri)
+            for (auto x : pairs) {
+                if (i == x[0])
+                    goto skipIteration;
+            }
+
+            // Show that A[i] is a distinct value, not indexed by any li
+            // (We would replace some element in B with A[i])
+            for (rit = pairs.rbegin(); rit != pairs.rend(); rit++) {
+                if (A[i] == A[(*rit)[0]])
+                    goto skipIteration;
+            }
+            distinctPairsBAsIs++;
+            break;
+
+            skipIteration:
+            continue;
+        }
+
+        allDone:
+        return distinctPairsBAsIs;
+    }
+
+    void test() {
+//        vector<int> A = {
+//                1, 2, 3, 4
+//        };
+//        vector<int> B = {
+//                1, 2, 3, 3
+//        };
+        auto *A = &beautiful_pairs::testCase01_A;
+        auto *B = &beautiful_pairs::testCase01_B;
+
+        COUT("Beautiful Pairs");
+        int result = beautifulPairs(*A, *B);
+        COUT(("Maximum number of disjoint Beautiful Pairs with one replacement in B allowed = "+to_string(result)).data());
+    }
+}
+
 /* The main driver
  *
  *
@@ -740,7 +832,8 @@ int main() {
 //    luck_balance::test();
 //    maximumPerimeterTriangle::test();
 //    largestPermutation::test();
-    greedy_florist::test();
+//    greedy_florist::test();
+    beautiful_pairs::test();
 
     COUT("Complete");
     return 0;
