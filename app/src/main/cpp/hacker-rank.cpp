@@ -1315,6 +1315,127 @@ namespace time_conversion {
     }
 }
 
+namespace cutting_boards_hard {
+    // Aids in representing a cost that fits in a long to a cost that fits in an int
+    const int DIVISOR = 1000000007;
+
+    void updateTotalCostOfCuts(int &cost, int &numberOfSegments, int &costSoFar) {
+        long costPerSlice = (cost * numberOfSegments) % DIVISOR;
+
+        costPerSlice = (costPerSlice + costSoFar) % DIVISOR;
+        costSoFar = static_cast<int>(costPerSlice);
+    }
+
+
+    // Complete the boardCutting function below.
+    // Minimize the cost of cutting a board into 1x1 squares
+    int boardCutting(vector<int> cost_y, vector<int> cost_x) {
+        int  xit, yit, numHorizontalSegments, numVerticalSegments;
+
+        // Sort reverse of natural order, greatest cost first
+        sort(cost_y.begin(), cost_y.end(), greater<int>());
+        sort(cost_x.begin(), cost_x.end(), greater<int>());
+
+        int totalCost = 0;
+        xit = yit = 0;
+        numHorizontalSegments = numVerticalSegments = 1;
+
+        // The cuts with the GREATEST costs are made first.
+        // If a cut along rows ties on cost with a cut along columns,
+        // then choose the cut with the FEWER segments across first
+        while (xit < cost_x.size() && yit < cost_y.size()) {
+            if (cost_x[xit] > cost_y[yit]) {
+                // Cut along the column, across the current number of vertical segments
+                updateTotalCostOfCuts(cost_x[xit++], numVerticalSegments, totalCost);
+                numHorizontalSegments++;
+            } else if (cost_x[xit] == cost_y[yit]) {
+                if (numVerticalSegments < numHorizontalSegments) {
+                    // Cut along the column, across the current number of vertical segments
+                    updateTotalCostOfCuts(cost_x[xit++], numVerticalSegments, totalCost);
+                    numHorizontalSegments++;
+                } else {
+                    // Cut along the row, across the current number of horizontal segments
+                    updateTotalCostOfCuts(cost_y[yit++], numHorizontalSegments, totalCost);
+                    numVerticalSegments++;
+                }
+            } else {
+                // Cut along the row, across the current number of horizontal segments
+                updateTotalCostOfCuts(cost_y[yit++], numHorizontalSegments, totalCost);
+                numVerticalSegments++;
+            }
+        }
+
+        while (xit < cost_x.size()) {
+            updateTotalCostOfCuts(cost_x[xit++], numVerticalSegments, totalCost);
+            COUT("Just column cuts");
+        }
+
+        while (yit < cost_y.size()) {
+            updateTotalCostOfCuts(cost_y[yit++], numHorizontalSegments, totalCost);
+            COUT("Just row cuts");
+        }
+
+        return totalCost;
+    }
+
+    void test() {
+//        vector<int> cost_y = {
+//                2, 1, 3, 1, 4
+//        };
+//        vector<int> cost_x = {
+//                4, 1, 2
+//        };
+
+        COUT("Cuttings Boards");
+        COUT(("Total cost equivalence = "+to_string(boardCutting(
+                cutting_boards_hard::tc_y_08,
+                cutting_boards_hard::tc_x_08
+        ))).data());
+        COUT(("Expected answer = "+to_string(cutting_boards_hard::tc_answers[7])).data());
+
+        /*
+         * Cuttings Boards
+            Total cost equivalence = 42
+            Complete
+         */
+
+        /*
+         * // testcase 08
+         * Cuttings Boards
+            Total cost equivalence = 856128333
+            Expected answer = 604491628
+            Complete
+         */
+
+        /*
+         * // testcase 06
+         *Cuttings Boards
+            Total cost equivalence = 986256778
+            Expected answer = 288670782
+            Complete
+         */
+
+        /*
+         * // testcase 03
+         * Cuttings Boards
+            Total cost equivalence = 129443957
+            Expected answer = 733709321
+            Complete
+         */
+
+        /*
+         * // testcase 01
+         * Cuttings Boards
+            D: Total cost equivalence = 127210119
+                Expected answer = 278642107
+                Complete
+
+         */
+
+        // The error probably lies in the computation of cost
+    }
+}
+
 /* The main driver
  *
  *
@@ -1339,7 +1460,8 @@ int main() {
 //    largestPermutation::test();
 //    greedy_florist::test();
 //    beautiful_pairs::test();
-    jim_and_the_orders::test();
+//    jim_and_the_orders::test();
+    cutting_boards_hard::test();
 
     COUT("Complete");
     return 0;
