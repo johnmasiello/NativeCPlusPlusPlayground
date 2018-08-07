@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 #include <limits>
+#include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -810,6 +812,509 @@ namespace beautiful_pairs {
     }
 }
 
+namespace min_max {
+    // Complete the maxMin function below.
+    int maxMin(int k, vector<int> arr) {
+        sort(arr.begin(), arr.end());
+
+        const int n = arr.size() - k + 1;
+        int minrange, range;
+
+        minrange = arr.back() - arr.front();
+
+        for (int i = 0; i < n; i++) {
+            range = arr[i + k - 1] - arr[i];
+            if (range < minrange)
+                minrange = range;
+        }
+        return minrange;
+    }
+}
+
+namespace jim_and_the_orders {
+    // Complete the jimOrders function below.
+    vector<int> jimOrders(vector<vector<int>> orders) {
+        struct cmp {
+            // Map indices as follows:
+            // 0 - order number
+            // 1 - prep time
+            // 2 - customer number (natural order)
+            bool operator() (const vector<int> &a, const vector<int> &b) {
+                return a[0] + a[1] < b[0] + b[1] || (
+                        a[0] + a[1] == b[0] + b[1] && a[2] < b[2]);
+            }
+        };
+
+        // Key the customer number to each element in orders, uses 1-based counting
+        int i = 1;
+
+        for (int j = 0; j < orders.size(); j++) {
+            orders[j].push_back(i++);
+        }
+
+        sort(orders.begin(), orders.end(), cmp {} );
+
+        // Debug
+//        for (auto x: orders)
+//            output_std(x);
+
+        vector<int> servedOrders(orders.size());
+        for (int i = 0; i < orders.size(); i++)
+            servedOrders[i] = orders[i][2];
+
+        return servedOrders;
+    }
+
+    void test() {
+        vector<vector<int>> orders = {
+                {1, 8},
+                {2, 4},
+                {3, 3}
+        };
+        COUT("Jim and the Orders");
+        auto result = jimOrders(orders);
+        COUT("Order in which customers are served");
+        output_std(result);
+    }
+}
+
+namespace army_bases {
+    /*
+ * Complete the gameWithCells function below.
+ */
+    int gameWithCells(int n, int m) {
+        // Wrong answer, simply not the counted on the interior connections
+        // return (n > 1 ? n - 1 : n) * (m > 1 ? m - 1 : m);
+
+        // The correct idea is to consume to two army bases at a time per drop, and not consume them in a later drop
+        return (n / 2 + n % 2) * (m % 2 + m / 2);
+    }
+}
+
+namespace birthdayCakeCandles {
+    // Complete the birthdayCakeCandles function below.
+    int birthdayCakeCandles(vector<int> ar) {
+        // Aim to solve this problem with as single pass
+        long int index, tallest, count;
+        index = count = tallest = 0;
+
+        int n = ar.size();
+        while (index < n) {
+            if (ar[index] > tallest) {
+                tallest = ar[index];
+                // Reset count, and count for this instance
+                count = 1;
+            } else if (ar[index] == tallest)
+                count++;
+
+            index++;
+        }
+        return count;
+    }
+}
+
+namespace miniMaxSum {
+    // Complete the miniMaxSum function below.
+    void miniMaxSum(vector<int> arr) {
+        // Sum, minimum term -> form the max sum, maximum term -> form the min sum
+        long long int sum, min, max;
+        sum = max = 0;
+        min = UINT32_MAX; // We could just set min to the value of the first element in arr; By setting min explicitly, we handle the case arr is empty
+
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr[i] > max)
+                max = arr[i];
+            if (arr[i] < min)
+                min = arr[i];
+
+            sum += arr[i];
+        }
+
+        // The minimum is printed first
+        cout << sum - max << ' ';
+        cout << sum - min;
+    }
+}
+
+namespace forming_magic_square {
+    struct node {
+        float metric;
+        int replacement;
+        int selecti;
+        int selectj;
+        int cost;
+    };
+
+    void setNode(node &_node, float &metric, int &replacement, int &cost, int &selecti, int &selectj) {
+        _node.metric = metric;
+        _node.replacement = replacement;
+        _node.cost = cost;
+        _node.selecti = selecti;
+        _node.selectj = selectj;
+    }
+
+    bool isNewDigit(vector<vector<int>> &s, int &replacement) {
+        const int size = s.size();
+
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                if (s[i][j] == replacement)
+                    return false;
+
+        return true;
+    }
+
+    float computeMetric(float directEffects, float indirectEffects, float cost) {
+        return (directEffects + indirectEffects) / cost;
+    }
+
+    // Complete the formingMagicSquare function below.
+    int formingMagicSquare(vector<vector<int>> s) {
+        // Forming a benefit:cost metric that parallels s
+        // The benefit I will define as the difference between current value for row, column, diag and 15; The cost I will take from the problem definition
+        // UPDATE: I add the sum of the effects going in the other directions to the benefit,
+        // in order to make 'intelligent' replacements.
+        // Example, if a replacement makes a row equal to the target of 15, an effect to add in is by how much farther or closer is the corresponding column, diagonal with the same entry
+        // The final metric is the ratio of [benefit + sum of the effects] to cost
+        const int targetSum = 15;
+        const int size = 3;
+        const int upperBoundOpen = 10;
+        const int numReplacements = 9; // Terminate if exceeds 9 replacements
+        const float lowerBoundMetricOpen = -4 * upperBoundOpen;
+        const float lowerBoundMetricClosed = 0;
+        int actualNumReplacements;
+
+        vector<int> sumrows(size), sumcolumns(size), sumdiags(2);
+
+        // Used to ensure the replacement is not made on the same entry
+        vector<vector<bool>> selectIndicies(size);
+        vector<bool> consumedDigits(upperBoundOpen);
+
+        // Best metric is used to decide which replacement to make
+        node bestMetric {}, bestMetricNewDigit{};
+        node *chosenMetric;
+        float metric, ieffects;
+        bool solved;
+        int dummyReplacement, dummyCost, a, b;
+        int totalCost;
+
+        // Initialize
+        for (int i = 1; i < upperBoundOpen; i++)
+            consumedDigits[i] = false;
+
+        for (int i = 0; i < size; i++) {
+            selectIndicies[i].resize(0);
+            for (int j = 0; j < size; j++)
+                selectIndicies[i].push_back(false);
+        }
+        totalCost = 0;
+
+        for (actualNumReplacements = 0; actualNumReplacements < numReplacements; actualNumReplacements++) {
+            // Reset the best metric
+            bestMetric.metric           = lowerBoundMetricOpen;
+            bestMetricNewDigit.metric   = lowerBoundMetricOpen;
+            solved = true;
+
+            // Find the state of the rows, columns, diags
+            // Find their sums relative to targetSum
+            sumdiags[1] = sumdiags[0] = targetSum;
+
+            for (int i = 0; i < size; i++) {
+                // Diags
+                sumdiags[0] -= s[i][i];
+                sumdiags[1] -= s[i][size - 1 - i];
+
+                sumrows[i] = sumcolumns[i] = targetSum;
+                for (int j = 0; j < size; j++) {
+                    sumrows[i] -= s[i][j];
+                    sumcolumns[i] -= s[j][i];
+                }
+                if (!sumrows[i] || !sumcolumns[i])
+                    solved = false;
+            }
+            if (!sumdiags[0] || !sumdiags[1])
+                solved = false;
+
+            if (solved)
+                break;
+
+            // Calculate the 'benefit' for each entry of the matrix by finding a replacement which makes a row, column, or diagonal equal to targetSum. The replacement is restricted to [1, 9]. Also the effect can positive or negative, depending a row or column is nearer the target sum in magnitude after the replacement would occur. If the cost is 0, the replacement is void.
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    if (selectIndicies[i][j])
+                        continue;
+
+                    // Replacement for row
+                    if (sumrows[i]) {
+                        dummyReplacement = s[i][j] + sumrows[i];
+                        if (dummyReplacement > 0 && dummyReplacement < upperBoundOpen &&
+                            !consumedDigits[dummyReplacement]) {
+
+                            dummyCost = abs(sumrows[i]);
+                            ieffects = abs(sumcolumns[i]) -
+                                       abs(sumcolumns[i] - sumrows[i]); // Variable effects on column
+
+                            if (i == j)
+                                ieffects += abs(sumdiags[0]) -
+                                            abs(sumdiags[0] - sumrows[i]); // Variable effects on diagonal
+
+                            if (i == size - 1 - j)
+                                ieffects += abs(sumdiags[1]) -
+                                            abs(sumdiags[1] - sumrows[i]); // Variable effects on diagonal
+
+                            // Assume the difference of the sum of the row and its target is equal to the difference of the entry and its replacement
+
+                            metric = computeMetric(dummyCost, ieffects, dummyCost);
+                            chosenMetric = isNewDigit(s, dummyReplacement) ? &bestMetricNewDigit : &bestMetric;
+
+                            if (metric > chosenMetric->metric) {
+                                setNode(
+                                        *chosenMetric,
+                                        metric,
+                                        dummyReplacement,
+                                        dummyCost,
+                                        i,
+                                        j
+                                );
+                            }
+                        }
+                    }
+
+                    // Replacement for column
+                    if (sumcolumns[i]) {
+                        dummyReplacement = s[i][j] + sumcolumns[i];
+                        if (dummyReplacement > 0 && dummyReplacement < upperBoundOpen &&
+                            !consumedDigits[dummyReplacement]) {
+                            dummyCost = abs(sumcolumns[i]);
+                            ieffects = abs(sumrows[i]) -
+                                       abs(sumrows[i] - sumcolumns[i]); // Variable effects on row
+
+                            if (i == j)
+                                ieffects += abs(sumdiags[0]) -
+                                            abs(sumdiags[0] - sumcolumns[i]); // Variable effects on diagonal
+
+                            if (i == size - 1 - j)
+                                ieffects += abs(sumdiags[1]) -
+                                            abs(sumdiags[1] - sumcolumns[i]); // Variable effects on diagonal
+
+                            metric = computeMetric(dummyCost, ieffects, dummyCost);
+                            chosenMetric = isNewDigit(s, dummyReplacement) ? &bestMetricNewDigit : &bestMetric;
+
+                            if (metric > chosenMetric->metric) {
+                                setNode(
+                                        *chosenMetric,
+                                        metric,
+                                        dummyReplacement,
+                                        dummyCost,
+                                        i,
+                                        j
+                                );
+                            }
+                        }
+                    }
+
+                    // Replacement for Diagonal 1
+                    if (i == j && sumdiags[0]) {
+                        dummyReplacement = s[i][j] + sumdiags[0];
+                        if (dummyReplacement > 0 && dummyReplacement < upperBoundOpen &&
+                            !consumedDigits[dummyReplacement]) {
+                            dummyCost = abs(sumdiags[0]);
+                            ieffects = abs(sumrows[i]) -
+                                       abs(sumrows[i] - sumdiags[0]); // Variable effects on row
+
+                            ieffects += abs(sumcolumns[i]) -
+                                        abs(sumcolumns[i] - sumdiags[0]); // Variable effects on column
+
+                            if (i == size - 1 - j)
+                                ieffects += abs(sumdiags[1]) -
+                                            abs(sumdiags[1] - sumdiags[0]); // Variable effects on diag 2
+
+                            metric = computeMetric(dummyCost, ieffects, dummyCost);
+                            chosenMetric = isNewDigit(s, dummyReplacement) ? &bestMetricNewDigit :
+                                           &bestMetric;
+
+                            if (metric > chosenMetric->metric) {
+                                setNode(
+                                        *chosenMetric,
+                                        metric,
+                                        dummyReplacement,
+                                        dummyCost,
+                                        i,
+                                        j
+                                );
+                            }
+                        }
+                    }
+
+                    // Replacement for Diagonal 2
+                    if (i == size - 1 - j && sumdiags[1]) {
+                        dummyReplacement = s[i][j] + sumdiags[1];
+                        if (dummyReplacement > 0 && dummyReplacement < upperBoundOpen &&
+                            !consumedDigits[dummyReplacement]) {
+                            dummyCost = abs(sumdiags[1]);
+                            ieffects = abs(sumrows[i]) -
+                                       abs(sumrows[i] - sumdiags[1]); // Variable effects on row
+
+                            ieffects += abs(sumcolumns[i]) -
+                                        abs(sumcolumns[i] - sumdiags[1]); // Variable effects on column
+
+                            if (i == j)
+                                ieffects += abs(sumdiags[0]) -
+                                            abs(sumdiags[0] - sumdiags[1]); // Variable effects on diag 1
+
+                            metric = computeMetric(dummyCost, ieffects, dummyCost);
+                            chosenMetric = isNewDigit(s, dummyReplacement) ? &bestMetricNewDigit : &bestMetric;
+
+                            if (metric > chosenMetric->metric) {
+                                setNode(
+                                        *chosenMetric,
+                                        metric,
+                                        dummyReplacement,
+                                        dummyCost,
+                                        i,
+                                        j
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Give priority to the best metric when a new digit is introduced
+            if (bestMetricNewDigit.metric >= lowerBoundMetricClosed)
+                chosenMetric = &bestMetricNewDigit;
+            else if (bestMetric.metric >= lowerBoundMetricClosed)
+                chosenMetric = &bestMetric;
+            else
+                chosenMetric = NULL;
+
+            if (chosenMetric)
+            {
+                dummyReplacement = chosenMetric->replacement;
+                dummyCost = chosenMetric->cost;
+                a = chosenMetric->selecti;
+                b = chosenMetric->selectj;
+                consumedDigits[dummyReplacement] = true;
+                s[a][b] = dummyReplacement;
+                totalCost += dummyCost;
+                selectIndicies[a][b] = true;
+                cout << "s[" << a << "][" << b << "] = "
+                     << dummyReplacement <<
+                     " with cost = " << dummyCost << endl;
+            } else
+                break;
+        }
+        cout << "Actual number of replacements = " << actualNumReplacements << endl;
+        cout << endl;
+        cout << s[0][0] << ' ' << s[0][1] << ' ' << s[0][2] << endl;
+        cout << s[1][0] << ' ' << s[1][1] << ' ' << s[1][2] << endl;
+        cout << s[2][0] << ' ' << s[2][1] << ' ' << s[2][2] << endl;
+        return totalCost;
+    }
+}
+
+namespace lowest_triangle {
+    int lowestTriangle(int base, int area){
+        return ceil(area * 2 / (float)base);
+    }
+}
+
+namespace plus_minus {
+    // Complete the plusMinus function below.
+    void plusMinus(vector<int> arr) {
+        const int precision = 6;
+        const int width = precision;
+        int n, neg, p, z;
+        double dN;
+
+        n = arr.size();
+        dN = n;
+        p = z = neg = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (arr[i] > 0)
+                p++;
+            else if (arr[i] < 0)
+                neg++;
+            else
+                z++;
+        }
+        // Print the output to stdout
+        cout << setprecision(precision) << fixed << p / dN << endl;
+        cout << setprecision(precision) << fixed << neg / dN << endl;
+        cout << setprecision(precision) << fixed << z / dN << endl;
+    }
+}
+
+namespace paper_cutting {
+    // Complete the solve function below.
+    long solve(int n, int m) {
+        // Cut the smaller side a - 1 times to get [number of strips = a] of b squares to cut b - 1 times. Hence,
+        // a - 1 + a * (b - 1)
+        // == (a * (1) + a * (b - 1)) - 1
+        // == a * b - 1;
+        return (long)n * m - 1;
+    }
+}
+
+namespace special_multiples {
+    // Complete the solve function below.
+    string solve(int n) {
+        // We want to leverage numbers created in 9,0 by saving them
+        // Leverage solutions for n by saving them
+        static vector<unsigned long long> nines_numbers(1, 9);
+        static string solved_numbers[501];
+
+        if (solved_numbers[n].length() != 0)
+            return solved_numbers[n];
+
+        int index = 0;
+        while (true) {
+            if (index == nines_numbers.size()) {
+                // Construct nines numbers by taking combinations with higher order 9's
+                for (int j = 0; j < index; j++) {
+                    nines_numbers.push_back(nines_numbers[j] * 10);
+                    nines_numbers.push_back(nines_numbers[j] * 10 + 9);
+                }
+            }
+            if (nines_numbers[index] % n == 0) {
+                solved_numbers[n] = to_string(nines_numbers[index]);
+                return solved_numbers[n];
+            }
+            index++;
+        }
+    }
+}
+
+namespace staircase {
+    // Complete the staircase function below.
+    void staircase(int n) {
+        for (int i = n; i > 0; i--) {
+            for (int j = 0; j < n; j++) {
+                if (j < i - 1)
+                    cout << ' ';
+                else
+                    cout << '#';
+            }
+            cout << endl;
+        }
+    }
+}
+
+namespace time_conversion {
+    /*
+    * Complete the timeConversion function below.
+    */
+    string timeConversion(string s) {
+        int hours = stoi(s.substr(0, 2)) % 12;
+
+        if (tolower(s.at(8)) == 'p')
+            hours += 12;
+
+        return (hours < 10 ? "0" : "") + to_string(hours) + s.substr(2, 6);
+    }
+}
+
 /* The main driver
  *
  *
@@ -833,7 +1338,8 @@ int main() {
 //    maximumPerimeterTriangle::test();
 //    largestPermutation::test();
 //    greedy_florist::test();
-    beautiful_pairs::test();
+//    beautiful_pairs::test();
+    jim_and_the_orders::test();
 
     COUT("Complete");
     return 0;
